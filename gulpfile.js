@@ -14,21 +14,19 @@ const $u = require('./gulp.util');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 
-gulp.task('build:dev', (cb) => {
+gulp.task('build:dev', gulp.parallel((cb) => {
   let config = webpackConfig(false);
   webpack(config, config.reporter(cb));
-});
+}));
 
-gulp.task('build:release', (cb) => {
+gulp.task('build:release', gulp.parallel((cb) => {
   let config = webpackConfig(true);
   webpack(config, config.reporter(cb));
-});
-// aliases
-gulp.task('build:prod', ['build:release']);
-gulp.task('build', ['build:dev']);
+}));
 
-gulp.task('default', () => {
+
+gulp.task('default', gulp.parallel(() => {
   process.env.NODE_ENV = process.env.NODE_ENV || "development";
   let config = webpackConfig(process.env.NODE_ENV === "production", true);
   webpack(config, config.reporter());
-});
+}));
