@@ -51,10 +51,10 @@ class Security {
 			Uploader::error("Missing Report");
 		}
 
-		$limit = 50 * 1024;
-		if ($size > $limit) {
-			Log::severe("Data too large: $size > $limit");
-			Uploader::error("Data too large: $size > $limit");
-		}
+		// $limit = 200 * 1024;
+		// if ($size > $limit) {
+		// 	Log::severe("Data too large: $size > $limit");
+		// 	Uploader::error("Data too large: $size > $limit");
+		// }
 	}
 }

@@ -132,17 +132,18 @@ export default class TimingsChart extends React.Component {
     tpsSeries.dataFields.entitiesValueY = "entities";
     tpsSeries.dataFields.tileEntitiesValueY = "tileEntities";
     tpsSeries.dataFields.chunksValueY = "chunks";
-    tpsSeries.tooltipHTML = "<div style='text-align: left;'>\
-      TPS: {valueY}<br>\
-      Players: {playersValueY}<br>\
-      TPS Loss: {tpsLossValueY}%<br>\
-      Entities: {entitiesValueY}<br>\
-      Tile Entities: {tileEntitiesValueY}\
+    tpsSeries.tooltipHTML =
+    "<div style='text-align: left;color: #fff'>\
+    TPS: {valueY}<br>\
+    Players: {playersValueY}<br>\
+    TPS Loss: {tpsLossValueY}%<br>\
+    Entities: {entitiesValueY}<br>\
+    Tile Entities: {tileEntitiesValueY}\
     </div>";
     tpsSeries.tooltip.background.fill = am4core.color("#222");
-    tpsSeries.tooltip.background.cornerRadius = 0;
-    tpsSeries.tooltip.background.stroke = am4core.color("#2190d4");
-    tpsSeries.tooltip.background.strokeOpacity = 1;
+    tpsSeries.tooltip.background.cornerRadius = 6;
+    // tpsSeries.tooltip.background.stroke = am4core.color("#2190d4");
+    // tpsSeries.tooltip.background.strokeOpacity = 1;
     tpsSeries.tooltip.fontWeight = 100;
     tpsSeries.tooltip.stroke = am4core.color("#fff");
     tpsSeries.tooltip.getStrokeFromObject = true;
