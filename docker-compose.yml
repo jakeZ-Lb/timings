@@ -1,7 +1,12 @@
 version: "3.9"
-
+networks:
+  t2_proxy:
+    name: t2_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
 services:
-
 
   nginx:
     build:
@@ -18,7 +23,6 @@ services:
       - ./.htpasswd:/var/www/html/.htpasswd
       
       # - ./apache2.conf:/etc/apache2/apache2.conf
-
       
 
     
