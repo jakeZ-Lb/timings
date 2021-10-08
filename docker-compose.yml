@@ -1,13 +1,77 @@
 version: "3.9"
-
+networks:
+  t2_proxy:
+    name: t2_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
 services:
-  timings:
+
+  traefik:
+    image: "traefik:v2.4"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      #- "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - --entryPoints.http.address=:80
+      - --entryPoints.https.address=:443
+      # cert resolver
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+
+      - "--certificatesresolvers.myresolver.acme.email=jzukauska@outlook.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - --providers.docker.network=t2_proxy
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - t2_proxy
+  nginx:
     build:
       context: .
       dockerfile: dockerfile
     image: hydreon/timings
+    
     ports:
-      - 80:8080
+      - "8080:8080"
     volumes:
       - ./nginx-server.conf:/etc/nginx/nginx.conf
       - ./config.ini:/var/www/html/config.ini
+      - ./php.ini:/etc/php8/php.ini
+      - ./.htpasswd:/var/www/html/.htpasswd
+      
+      # - ./apache2.conf:/etc/apache2/apache2.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.service=web-svc"
+      - "traefik.http.services.web-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.web.rule=Host(`timings.boatstat.us`)"
+      - "traefik.http.routers.web.entrypoints=websecure"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.routers.web.tls.certresolver=myresolver"
+    networks:
+      - t2_proxy
+      
+
+    
+  # certbot:
+  #   image: certbot/certbot
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./data/certbot/conf:/etc/letsencrypt
+  #     - ./data/certbot/www:/var/www/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
